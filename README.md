@@ -12,7 +12,7 @@ This will guide through the steps to install the App Sail CLI (command line inte
 
 ## Installing App Sail ##
 
-To install the App Sail CLI, visit https://appsail.digitalocean.com and choose to Create or Launch a new app. Follow the on-screen instructions for installing the CLI. (On Windows, download and run https://appsail.nyc3.digitaloceanspaces.com/cli/windows/AppSailSetup.exe)
+To install the App Sail CLI, visit https://cloud.digitalocean.com/appsail and choose to Create or Launch a new app. Follow the on-screen instructions for installing the CLI. (On Windows, download and run https://appsail.nyc3.digitaloceanspaces.com/cli/windows/AppSailSetup.exe)
 
 ## Downloading the Sample App Source Code
 
@@ -25,7 +25,7 @@ To download the demo app run in your terminal:
 
 	sail push
 
-It will ask for an auth key if you haven't used the sail CLI before. Retrieve it from [the auth page](https://appsail.digitalocean.com/go/auth).
+It will ask for an auth key if you haven't used the sail CLI before. Retrieve it from [the auth page](https://cloud.digitalocean.com/appsail/auth).
 
 Then it will ask how to configure the app.
 Answer the questions as follows:
@@ -45,7 +45,7 @@ After that, it will go through a deploy process. Once it's done, you can open th
 ## Viewing Application Logs ##
 
 You can view your application's logs by following these steps:
-1. Visit the app dashboard at https://appsail.digitalocean.com/
+1. Visit the app dashboard at https://cloud.digitalocean.com/appsail
 1. Navigate to the sample-expressjs app
 1. Click "Logs"
 
@@ -64,7 +64,7 @@ To learn more about this command, run `sail logs -h`
 ## Deleting the App #
 
 When you no longer need this sample application running live, you can delete it by following these steps:
-1. Visit the app dashboard at https://appsail.digitalocean.com/
+1. Visit the app dashboard at https://cloud.digitalocean.com/appsail
 1. Navigate to the sample-expressjs app
 1. Choose "App Config"->"Show More"
 1. Select "Delete", type your app's name, and click "Delete App".
