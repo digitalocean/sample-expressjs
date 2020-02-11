@@ -30,36 +30,21 @@ It will ask for an auth key if you haven't used the sail CLI before. Retrieve it
 Then it will ask how to configure the app.
 Answer the questions as follows:
 
-    ✓ Who does this app belong to: <choose your personal account or team>
-    ✓ What should this app be called: sample-expressjs
-    Let's configure your app for deployment:
-    ✓ Choose your configuration preference: Manual...
-    ✓ Which Dockerfile: Dockerfile
-    ✓ Port to forward requests to: 80
-    ✓ What command will run the app:
-    ✓ Do you need any background workers: No
-    ✓ Do you need a database: No
+	✓ Is this app already live (on App Sail)?: No
+	✓ Name this app : sample-expressjs
+	✓ Need to set any env variables: No
+	Let's configure your app for deployment:
+	✓ Choose your configuration preference: Automatic...
+	✓ Node app detected, is this correct: Yes
+	✓ Use Node 10: Yes
+	✓ Do you need a database: No
 
 After that, it will go through a deploy process. Once it's done, you can open the live app or administration dashboard by following the links provided by the App Sail CLI once the push is completed.
 
-## Viewing Application Logs ##
+## Learn More ##
 
-You can view your application's logs by following these steps:
-1. Visit the app dashboard at https://cloud.digitalocean.com/appsail
-1. Navigate to the sample-expressjs app
-1. Click "Logs"
+You can learn more about App Sail and how to manage and update your application at https://www.digitalocean.com/docs/appsail/.
 
-Alternatively, from your terminal while inside your top level application directory (e.g. sample-expressjs), run:
-
-	sail logs --recent
-	
-Or to see a live stream of your logs, run:
-
-	sail logs
-
-Then visit your live app in your browser to generate some log output (which you'll see in your terminal). Use ctrl-c to stop viewing your log stream in your terminal.
-	
-To learn more about this command, run `sail logs -h`
 
 ## Deleting the App #
 
