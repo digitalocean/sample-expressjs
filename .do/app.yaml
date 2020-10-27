@@ -1,0 +1,8 @@
+name: sample-expressjs
+services:
+- environment_slug: node-js
+  github:
+    branch: master
+    deploy_on_push: true
+    repo: digitalocean/sample-expressjs
+  name: sample-expressjs

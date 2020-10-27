@@ -2,8 +2,7 @@ spec:
   name: sample-expressjs
   services:
   - environment_slug: node-js
-    github:
+    git:
       branch: main
-      deploy_on_push: true
-      repo: digitalocean/sample-expressjs
+      repo_clone_url: https://github.com/digitalocean/sample-expressjs.git
     name: sample-expressjs
