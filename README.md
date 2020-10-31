@@ -57,3 +57,6 @@ This will delete the app and destroy any underlying DigitalOcean resources
 ## Troubleshooting ##
 
 One of the more common problems with deployments is when the service doesn't start. An excellent way of making sure that your application will deploy is to add some tests that verify things run. See the `__tests__` folder for some example tests.
+
+- Make sure that your service starts, and stays up.
+- If you get HTTPS errors, and you have recently migrated DNS records to the App Platform, you may need to wait for DNS changes to propagate.
