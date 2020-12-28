@@ -34,7 +34,7 @@ Here's an example code change you can make for this app:
 
 ## Learn More ##
 
-You can learn more about the App Platform and how to manage and update your application at https://www.digitalocean.com/products/app-platform/.
+You can learn more about the App Platform and how to manage and update your application at https://www.digitalocean.com/docs/app-platform/.
 
 
 ## Deleting the App #
