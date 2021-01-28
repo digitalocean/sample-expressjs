@@ -21,10 +21,10 @@ const startupMessage = `
 [0m
 `
 
-app.get('/', (req, res) => res.send('Hello World!'))
+app.get('/', (req, res) => res.send("Hello World! | apa kabar gais?"))
 
 for (let line of startupMessage.split("\n")) {
 	console.log(line)
 }
 
-app.listen(port, () => console.log(`sample-expressjs app listening on port ${port}!`))
+app.listen(port, () => console.log(`App berjalan pada port ${port}!`))
