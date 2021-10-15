@@ -53,4 +53,11 @@ When you no longer need this sample application running live, you can delete it 
 2. Navigate to the sample app.
 3. In the **Settings** tab, click **Destroy**.
 
+## Troubleshooting
+
+One of the more common problems with deployments is when the service doesn't start. An excellent way of making sure that your application will deploy is to add some tests that verify things run. See the `__tests__` folder for some example tests.
+
+- Make sure that your service starts, and stays up.
+- If you get HTTPS errors, and you have recently migrated DNS records to the App Platform, you may need to wait for DNS changes to propagate.
+
 **Note: If you do not delete your app, charges for using DigitalOcean services will continue to accrue.**
