@@ -5,15 +5,32 @@
   "main": "index.js",
   "scripts": {
 	"start": "node index.js",
+  "develop": "nodemon node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "github.com/digitalocean-appsail/sample-express"
   },
-  "author": "",
+  "devDependencies": {
+    "http-proxy-middleware": "^2.0.2"
+  },
+  "author": "Von Mises",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "axios": "^0.25.0",
+    "body-parser": "^1.19.1",
+    "connect": "^3.7.0",
+    "crypto-js": "^4.1.1",
+    "decompress-response": "^8.0.0",
+    "dotenv": "^16.0.0",
+    "express-subdomain": "^1.0.5",
+    "harmon": "^1.4.4",
+    "http-proxy": "^1.18.1",
+    "http-proxy-response-rewrite": "^0.0.1",
+    "http2-proxy": "^5.0.53",
+    "http2-wrapper": "^2.1.10",
+    "nodemon": "^2.0.15"
   }
 }
