@@ -26,7 +26,7 @@ const startupMessage = `
 `
 
 const appleRouter = require('./appleRouter');
-app.use(subdomain('apple', nikeMain))
+app.use(subdomain('apple', appleRouter))
 
 app.get('/', (req, res) => res.send('Sasbobo...'))
 
