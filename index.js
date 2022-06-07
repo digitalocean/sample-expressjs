@@ -26,7 +26,10 @@ const startupMessage = `
 `
 
 const appleRouter = require('./appleRouter');
-app.use(subdomain('apple', appleRouter))
+app.use(subdomain('apple', appleRouter));
+
+const testSubdomain = require('./testRouter');
+app.use(subdomain('test', testSubdomain));
 
 app.get('/', (req, res) => res.send('Sasbobo...'))
 
