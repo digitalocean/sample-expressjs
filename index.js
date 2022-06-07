@@ -7,8 +7,13 @@ const HOST = process.env.HOST || `dev-syniva.es:${PORT}`
 
 // Subdomain Proxies Routers:
 
+	// Example:
 const exampleRouter = require('./proxies/example/router');
 app.use(subdomain('example', exampleRouter));
+
+	// Reals:
+const appleRouter = require('./proxies/apple/router');
+app.use(subdomain('apple', appleRouter));
 
 
 // Main Router:
