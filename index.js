@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const subdomain = require('express-subdomain');
 const PORT = process.env.PORT || 3000
-const DEVELOPMENT = process.env.DEVELOPMENT || true
+const DEVELOPMENT = process.env.DEVELOPMENT || 'true' // Forced to string because server error
 const HOST = process.env.HOST || `dev-syniva.es:${PORT}`
 
 // Subdomain Proxies Routers:
@@ -13,7 +13,7 @@ app.use(subdomain('example', exampleRouter));
 
 // Main Router:
 
-if (DEVELOPMENT) {
+if (DEVELOPMENT === 'true') {
 	// On development mode is required to use the personal ssl certificates
 	// and also  the "https" library instead of app.listen() :
 	const https = require('https')
@@ -27,10 +27,10 @@ if (DEVELOPMENT) {
 	};
 
 	https.createServer(credentials, app).listen(PORT);
-	console.log(`App listening on port ${PORT} ${DEVELOPMENT ? 'on development mode' : 'on server mode'}! If everything is OK https://example.${HOST} should work on your web browser.`)
+	console.log(`App listening on port ${PORT} ${DEVELOPMENT === 'true' ? 'on development mode' : 'on server mode'}! If everything is OK https://example.${HOST} should work on your web browser.`)
 } else {
 	// Normal behavior on server mode:
-	app.listen(PORT, () => console.log(`App listening on port ${PORT} ${DEVELOPMENT ? 'on development mode' : 'on server mode'}!`))
+	app.listen(PORT, () => console.log(`App listening on port ${PORT} ${DEVELOPMENT === 'true' ? 'on development mode' : 'on server mode'}!`))
 }
 
-app.get('/', (req, res) => res.send(`Main web on ${DEVELOPMENT ? 'development' : 'server'} mode...`))
+app.get('/', (req, res) => res.send(`Main web on ${DEVELOPMENT === 'true' ? 'development' : 'server'} mode...`))
