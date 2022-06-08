@@ -98,6 +98,11 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
 
         // [TIP] -> It's possible to modify JS too if required (same logic as CSS) for sites with hydration
 
+        // LAST CHOICE TO CHANGE THINGS:
+        if (body) {
+            return body
+                .replaceAll('/v/home/takeover/c/images/', 'https://www.apple.com/v/home/takeover/c/images/')
+        }
         return body;
     });
 });
