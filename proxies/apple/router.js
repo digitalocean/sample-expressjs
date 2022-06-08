@@ -3,6 +3,7 @@ const fs = require('fs');
 const https = require('https');
 const httpProxy = require('http-proxy');
 const harmon = require('harmon');
+var axios = require('axios')
 const modifyResponse = require('../../utils/modifyResponseOnFly');
 // require('dotenv').config(); // Not sure to use this
 
@@ -13,6 +14,42 @@ const PORT_STRING = DEVELOPMENT === 'true' ? `:${PORT}` : ''
 const PROXY_SUBDOMAIN = 'apple';
 const HOST = process.env.HOST || `dev-syniva.es`
 const SUBDOMAIN_HOST = `${PROXY_SUBDOMAIN}.${HOST}`
+const STATIC_FOLDER = './proxies/apple/static/'
+
+// Download function:
+const downloadFile = async (url, filePath) => {
+    // Writer stream where we want to download the file:
+    const writer = fs.createWriteStream(`${filePath}/${url.split('/').at(-1)}`);
+    const streamResponse = await axios({
+        method: 'get',
+        url: url,
+        headers: {
+            // Headers are from postman
+            'authority': BRAND_URL,
+            'referer': `https://${BRAND_URL}/es/`,
+            'Cookie': 'geo=ES'
+        },
+        responseType: 'stream' // This is required to use .pipe()
+    });
+
+    // Write data
+    streamResponse.data.pipe(writer);
+
+    writer.on('finish', () => console.log(`Finished download of ${url}`));
+    writer.on('error', () => console.error(`[ERROR] Error while dowloading ${url}`));
+}
+
+const cacheFile = async (reqPath, folderToSave, brandUrl) => {
+    // Extract info:
+    const fileName = reqPath.split('/').at(-1);
+    if (fs.existsSync(`${folderToSave}/${fileName}`)) {
+        return {fileName: fileName, root: folderToSave}
+    } else {
+        // Downloading fonts:
+        await downloadFile(`https://${brandUrl}${reqPath}`, folderToSave);
+        return {fileName: fileName, root: folderToSave}
+    }
+}
 
 // Proxy:
 var proxy = httpProxy.createProxyServer({
@@ -85,7 +122,7 @@ router.use(harmon([], [
         query: 'link[href^="https://www.apple.com/wss"]',
         func: (node) => {
             let currentHref = node.getAttribute('href');
-            node.setAttribute('href', currentHref.replaceAll('www.apple.com', `${SUBDOMAIN_HOST}${PORT_STRING}`))
+            node.setAttribute('href', currentHref.replaceAll(BRAND_URL, `${SUBDOMAIN_HOST}${PORT_STRING}`))
         }
     },
     {
@@ -101,7 +138,7 @@ router.use(harmon([], [
         query: 'a[href*="www.apple.com"]',
         func: (node) => {
             let currentHref = node.getAttribute('href');
-            node.setAttribute('href', currentHref.replaceAll('www.apple.com', `${SUBDOMAIN_HOST}${PORT_STRING}`));
+            node.setAttribute('href', currentHref.replaceAll(BRAND_URL, `${SUBDOMAIN_HOST}${PORT_STRING}`));
         }
     },
     {
@@ -115,11 +152,8 @@ router.use(harmon([], [
         query: '[href*="/goto/"]',
         func: (node) => {
             let currentHref = node.getAttribute('href');
-            console.log('href -> ', currentHref);
             if (currentHref.includes('buy_mac/macbook_air_m2')) {
-                console.log('href con macbook air m2 -> ', currentHref);
                 currentHref = currentHref.replaceAll('macbook_air_m2', 'macbook-air/con-chip-m2');
-                console.log('href con macbook air m2 CHANGED -> ', currentHref);
             }
             node.setAttribute('href', currentHref.replaceAll('/goto/', '/').replaceAll('_', '-'));
         }
@@ -128,31 +162,7 @@ router.use(harmon([], [
         query: 'img[src^="/"]',
         func: (node) => {
             let currentSrc = node.getAttribute('src');
-            node.setAttribute('src', `https://www.apple.com${currentSrc}`);
-        }
-    },
-    {
-        query: '[srcset*=".png"]',
-        func: (node) => {
-            let currentSrcset = node.getAttribute('srcset');
-            node.setAttribute('srcset', `https://www.apple.com${currentSrcset}`);
-            node.setAttribute('srcset', currentSrcset.replaceAll(', ', ', https://www.apple.com'));
-        }
-    },
-    {
-        query: '[srcset*=".jpg"]',
-        func: (node) => {
-            let currentSrcset = node.getAttribute('srcset');
-            node.setAttribute('srcset', `https://www.apple.com${currentSrcset}`);
-            node.setAttribute('srcset', currentSrcset.replaceAll(', ', ', https://www.apple.com'));
-        }
-    },
-    {
-        query: '[srcset*=".webp"]',
-        func: (node) => {
-            let currentSrcset = node.getAttribute('srcset');
-            node.setAttribute('srcset', `https://www.apple.com${currentSrcset}`);
-            node.setAttribute('srcset', currentSrcset.replaceAll(', ', ', https://www.apple.com'));
+            node.setAttribute('src', `https://${BRAND_URL}${currentSrc}`);
         }
     }
 ]));
@@ -166,7 +176,52 @@ proxy.on('proxyReq', function (proxyReq, req, res, options) {
     proxyReq.setHeader('Authority', BRAND_URL);
 });
 
-// Router:
+// Router for font css:
+router.all('/wss/fonts', (req, res) => {
+    // Config extracted from postman request:
+    var config = {
+        method: 'get',
+        url: `https://www.apple.com${req.originalUrl}`,
+        headers: {
+            'authority': BRAND_URL,
+            'accept': 'text/css,*/*;q=0.1',
+            'referer': `https://${BRAND_URL}/es/`,
+            'Cookie': 'geo=ES'
+        }
+    };
+
+    axios(config)
+        .then(function (response) {
+            res.setHeader("Content-Type", "text/css");
+            res.send(response.data)
+        })
+        .catch(function (error) {
+            console.log('[ERROR] Router for css fonts axios call: ', error);
+            res.send('Error');
+        });
+});
+
+// Router for fonts:
+router.all('/wss/fonts*', async (req, res) => {
+    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
+    res.sendFile(data.fileName, {root: data.root});
+});
+
+// Routers for images:
+router.all('/*.png', async (req, res) => { // Change to custom font urls
+    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
+    res.sendFile(data.fileName, {root: data.root});
+});
+router.all('/*.jpg', async (req, res) => { // Change to custom font urls
+    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
+    res.sendFile(data.fileName, {root: data.root});
+});
+router.all('/*.webp', async (req, res) => { // Change to custom font urls
+    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
+    res.sendFile(data.fileName, {root: data.root});
+});
+
+// Router general:
 router.all('/*', (req, res) => {
     proxy.web(req, res);
 })
