@@ -14,7 +14,7 @@ const PORT_STRING = DEVELOPMENT === 'true' ? `:${PORT}` : ''
 const PROXY_SUBDOMAIN = 'apple';
 const HOST = process.env.HOST || `dev-syniva.es`
 const SUBDOMAIN_HOST = `${PROXY_SUBDOMAIN}.${HOST}`
-const STATIC_FOLDER = './proxies/apple/static/'
+const STATIC_FOLDER = './proxies/apple/static'
 
 // Download function:
 const downloadFile = async (url, filePath) => {
@@ -33,7 +33,7 @@ const downloadFile = async (url, filePath) => {
     });
 
     // Write data
-    streamResponse.data.pipe(writer);
+    await streamResponse.data.pipe(writer);
 
     writer.on('finish', () => console.log(`Finished download of ${url}`));
     writer.on('error', () => console.error(`[ERROR] Error while dowloading ${url}`));
