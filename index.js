@@ -5,6 +5,8 @@ const PORT = process.env.PORT || 3000
 const DEVELOPMENT = process.env.DEVELOPMENT || 'true' // Forced to string because server error
 const HOST = process.env.HOST || `dev-syniva.es:${PORT}`
 
+require('events').EventEmitter.prototype._maxListeners = 100; // Increase maxListeners
+
 // Subdomain Proxies Routers:
 
 	// Example:
