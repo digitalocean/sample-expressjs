@@ -226,6 +226,10 @@ router.all('/*.webp', async (req, res) => { // Change to custom font urls
     res.sendFile(data.fileName, {root: data.root});
 });
 
+router.all('/', (req, res) => {
+    res.redirect('/es');
+})
+
 // Router general:
 router.all('/*', (req, res) => {
     proxy.web(req, res);
