@@ -15,6 +15,9 @@ if (cart && cart.length > 0) {
     })
 }
 window.addEventListener("load", () => {
+    const iframe = document.querySelector('iframe[id="middle-end"]');
+    if (!iframe) { addIframe(); }
+
     // remove button of cart
     cart = document.querySelectorAll('a[class*="ac-gn-link-bag"]');
     if (cart && cart.length > 0) {
@@ -24,7 +27,6 @@ window.addEventListener("load", () => {
         })
     }
 
-    // addIframe();
     console.log('🚀');
     //document.cookie = "sq=3; path=/";
 
