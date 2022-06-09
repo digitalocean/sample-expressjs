@@ -4,3 +4,4 @@ secrets
 ssl
 proxies/*/static/*
 !test.txt
+.DS_store
