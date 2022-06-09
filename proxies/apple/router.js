@@ -101,7 +101,7 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
         // LAST CHOICE TO CHANGE THINGS:
         if (body) {
             return body
-                .replaceAll('/v/home/takeover/c/images/', 'https://www.apple.com/v/home/takeover/c/images/')
+                .replaceAll('srcset="/', 'https://www.apple.com/')
         }
         return body;
     });
