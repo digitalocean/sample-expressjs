@@ -5,7 +5,7 @@ const httpProxy = require('http-proxy');
 const harmon = require('harmon');
 var axios = require('axios')
 const modifyResponse = require('../../utils/modifyResponseOnFly');
-// require('dotenv').config(); // Not sure to use this
+// require('dotenv').config(); // Not sure to use this right now
 
 const BRAND_URL = 'www.apple.com';
 const DEVELOPMENT = process.env.DEVELOPMENT || 'true' // Forced to string because server error
@@ -14,7 +14,9 @@ const PORT_STRING = DEVELOPMENT === 'true' ? `:${PORT}` : ''
 const PROXY_SUBDOMAIN = 'apple';
 const HOST = process.env.HOST || `dev-syniva.es`
 const SUBDOMAIN_HOST = `${PROXY_SUBDOMAIN}.${HOST}`
+const PROXY_FOLDER = './proxies/apple'
 const STATIC_FOLDER = './proxies/apple/static'
+
 
 // Download function:
 const downloadFile = async (url, filePath) => {
@@ -92,16 +94,20 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
     modifyResponse(res, proxyRes.headers['content-encoding'], function (body) {
 
         // Modify CSS on the fly:
+        // [TIP] -> It's possible to modify JS too if required (same logic as CSS) for sites with hydration
         if (proxyRes.req.path.slice(proxyRes.req.path.length - 4) === '.css') {
             return body.replaceAll('url("/', 'url("https://www.apple.com/')
         }
-
-        // [TIP] -> It's possible to modify JS too if required (same logic as CSS) for sites with hydration
 
         // LAST CHOICE TO CHANGE THINGS WITH BRUTE FORCE (TRY HARMON FIRST):
         if (body) {
             // Example of changing by brute force the srcset of pictures using regex:
             let bodyString = body;
+
+            // Inserting the script 
+            // TODO: Check that it's an html content to insert the script
+            bodyString = bodyString.replaceAll('</body>', `<script type="text/javascript" defer>${fs.readFileSync(`${PROXY_FOLDER}/script.js`)}</script></body>`)
+            
             const srcsetRegex = /srcset="\/.*?"/gm;
             const srcsetMatches = [...bodyString.matchAll(srcsetRegex)];
             srcsetMatches.map(old => bodyString = bodyString.replaceAll(old[0], old[0].replaceAll('srcset="/', 'srcset="https://www.apple.com/')
@@ -165,6 +171,9 @@ router.use(harmon([], [
             let currentHref = node.getAttribute('href');
             if (currentHref.includes('buy_mac/macbook_air_m2')) {
                 currentHref = currentHref.replaceAll('macbook_air_m2', 'macbook-air/con-chip-m2');
+            }
+            if (currentHref.includes('shop/goto/store')) {
+                currentHref = currentHref.replaceAll('/shop/goto/','/');
             }
             node.setAttribute('href', currentHref.replaceAll('/goto/', '/').replaceAll('_', '-'));
         }
