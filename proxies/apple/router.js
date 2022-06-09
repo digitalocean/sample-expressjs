@@ -43,11 +43,11 @@ const cacheFile = async (reqPath, folderToSave, brandUrl) => {
     // Extract info:
     const fileName = reqPath.split('/').at(-1);
     if (fs.existsSync(`${folderToSave}/${fileName}`)) {
-        return {fileName: fileName, root: folderToSave}
+        return { fileName: fileName, root: folderToSave }
     } else {
         // Downloading fonts:
         await downloadFile(`https://${brandUrl}${reqPath}`, folderToSave);
-        return {fileName: fileName, root: folderToSave}
+        return { fileName: fileName, root: folderToSave }
     }
 }
 
@@ -98,10 +98,16 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
 
         // [TIP] -> It's possible to modify JS too if required (same logic as CSS) for sites with hydration
 
-        // LAST CHOICE TO CHANGE THINGS:
+        // LAST CHOICE TO CHANGE THINGS WITH BRUTE FORCE (TRY HARMON FIRST):
         if (body) {
-            return body
-                .replaceAll('srcset="/', 'srcset="https://www.apple.com/')
+            // Example of changing by brute force the srcset of pictures using regex:
+            let bodyString = body;
+            const srcsetRegex = /srcset="\/.*?"/gm;
+            const srcsetMatches = [...bodyString.matchAll(srcsetRegex)];
+            srcsetMatches.map(old => bodyString = bodyString.replaceAll(old[0], old[0].replaceAll('srcset="/', 'srcset="https://www.apple.com/')
+                .replaceAll(' /', ' https://www.apple.com/')
+            ))
+            return bodyString;
         }
         return body;
     });
@@ -209,21 +215,21 @@ router.all('/wss/fonts', (req, res) => {
 // Router for fonts:
 router.all('/wss/fonts*', async (req, res) => {
     const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
-    res.sendFile(data.fileName, {root: data.root});
+    res.sendFile(data.fileName, { root: data.root });
 });
 
 // Routers for images:
 router.all('/*.png', async (req, res) => { // Change to custom font urls
     const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
-    res.sendFile(data.fileName, {root: data.root});
+    res.sendFile(data.fileName, { root: data.root });
 });
 router.all('/*.jpg', async (req, res) => { // Change to custom font urls
     const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
-    res.sendFile(data.fileName, {root: data.root});
+    res.sendFile(data.fileName, { root: data.root });
 });
 router.all('/*.webp', async (req, res) => { // Change to custom font urls
     const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
-    res.sendFile(data.fileName, {root: data.root});
+    res.sendFile(data.fileName, { root: data.root });
 });
 
 router.all('/', (req, res) => {
