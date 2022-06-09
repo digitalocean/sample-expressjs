@@ -2,3 +2,5 @@ node_modules
 .sail
 secrets
 ssl
+proxies/*/static/*
+!test.txt
