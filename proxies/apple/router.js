@@ -101,7 +101,7 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
         // LAST CHOICE TO CHANGE THINGS:
         if (body) {
             return body
-                .replaceAll('srcset="/', 'https://www.apple.com/')
+                .replaceAll('srcset="/', 'srcset="https://www.apple.com/')
         }
         return body;
     });
