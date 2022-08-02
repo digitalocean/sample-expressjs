@@ -54,7 +54,8 @@ function addIframe() {
                 var new_element = old_element.cloneNode(true);
                 console.log('Replaced button');
                 new_element.addEventListener('click', function handleClick(event) {
-                    const itemSelected = getItem();
+                    let itemSelected = getItem();
+                    itemSelected.price = itemSelected.price.replaceAll('.', '').replaceAll(',', '.');
                     document
                         .getElementById("middle-end")
                         .contentWindow.postMessage(JSON.stringify(itemSelected), "*");
@@ -91,19 +92,20 @@ function getItem(target=null) {
     // TODO: Check all flows
     // TODO: Use url instead of querySelector in some cases (model, description)
     return item = {
-        code: querySelectorSafe('div.rc-summary-button form[method="get"]', 'data-part-number') || 'error',
-        name: querySelectorSafe('span.as-chiclets-text', 'innerText') || 'error',
-        description: description || 'error',
-        model: querySelectorSafe('input[name="dimensionScreensize"]:checked', 'value') || 'error', // Same as Name
-        color: querySelectorSafe('input[name="dimensionColor"]:checked', 'value') || 'error',
+        code: querySelectorSafe('div.rc-summary-button form[method="get"]', 'data-part-number') || 'code error',
+        name: querySelectorSafe('span.as-chiclets-text', 'innerText') || 'name error',
+        description: description || 'description error',
+        model: querySelectorSafe('input[name="dimensionScreensize"]:checked', 'value') || 'model error', // Same as Name
+        color: querySelectorSafe('input[name="dimensionColor"]:checked', 'value') || 'color error',
         price: querySelectorSafe('.as-price-currentprice > span', 'innerText')
             || querySelectorSafe('.as-localnav-price.as-localnav-price-show .rc-price > span.rc-prices-currentprice', 'innerText')
-            || querySelectorSafe('span[data-autom="full-price"]', 'innerText') || 'error',
-        size: querySelectorSafe('input[name="dimensionScreensize"]', 'value') || 'error',
+            || querySelectorSafe('span[data-autom="full-price"]', 'innerText') || 'price error',
+        size: querySelectorSafe('input[name="dimensionScreensize"]', 'value') || 'size error',
         quantity: 1, // Fixed
         url: window.location.href,
         imageUrl: querySelectorSafe('.rf-flagship-sticky img', 'src')
-            || querySelectorSafe('.rf-configuration-sticky img', 'src') || 'error',
+            || querySelectorSafe('.rf-configuration-sticky img', 'src')
+            || querySelectorSafe('.rf-bfe-gallery-image-wrapper img', 'src') || 'img error',
         marketPlaceId: 52, // To Be Defined
         marketplaceName: 'Apple'
     }
