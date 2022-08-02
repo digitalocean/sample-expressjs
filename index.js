@@ -14,8 +14,8 @@ const exampleRouter = require('./proxies/example/router');
 app.use(subdomain('example', exampleRouter));
 
 	// Reals:
-const appleRouter = require('./proxies/apple/router');
-app.use(subdomain('apple.dev', appleRouter));
+const appleRouterDev = require('./proxies/apple/router');
+app.use(subdomain('apple.dev', appleRouterDev));
 const appleRouter = require('./proxies/apple/router');
 app.use(subdomain('apple', appleRouter));
 
