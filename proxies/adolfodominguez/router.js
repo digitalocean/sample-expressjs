@@ -5,16 +5,19 @@ const httpProxy = require('http-proxy');
 const harmon = require('harmon');
 var axios = require('axios')
 const modifyResponse = require('../../utils/modifyResponseOnFly');
+const modifyBodyRegex = require('../../utils/modifyBodyRegEx');
+// require('dotenv').config(); // Not sure to use this right now
+//https://www.adolfodominguez.com
+const BRAND_URL = 'www.adolfodominguez.com';
+const PROXY_SUBDOMAIN = 'adolfodominguez';
+const PROXY_FOLDER = './proxies/adolfodominguez'
+const STATIC_FOLDER = './proxies/adolfodominguez/static'
 
-const BRAND_URL = 'www.apple.com';
 const DEVELOPMENT = process.env.DEVELOPMENT || 'true' // Forced to string because server error
 const PORT = process.env.PORT || 3000
 const PORT_STRING = DEVELOPMENT === 'true' ? `:${PORT}` : ''
-const PROXY_SUBDOMAIN = 'apple';
 const HOST = process.env.HOST || `dev-syniva.es`
 const SUBDOMAIN_HOST = `${PROXY_SUBDOMAIN}.${HOST}`
-const PROXY_FOLDER = './proxies/apple'
-const STATIC_FOLDER = './proxies/apple/static'
 
 
 // Download function:
@@ -27,7 +30,7 @@ const downloadFile = async (url, filePath) => {
         headers: {
             // Headers are from postman
             'authority': BRAND_URL,
-            'referer': `https://${BRAND_URL}/es/`,
+            'referer': `https://${BRAND_URL}`,
             'Cookie': 'geo=ES'
         },
         responseType: 'stream' // This is required to use .pipe()
@@ -67,9 +70,7 @@ var proxy = httpProxy.createProxyServer({
     protocolRewrite: 'https:',
     cookieDomainRewrite: {
         // Fill with all cookies-domains detected:
-        "apple.com": SUBDOMAIN_HOST,
-        "www.apple.com": SUBDOMAIN_HOST,
-        ".apple.com": SUBDOMAIN_HOST
+        "www.adolfodominguez.com": SUBDOMAIN_HOST,
     }
 });
 
@@ -92,26 +93,41 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
     // Modify response on the fly:
     modifyResponse(res, proxyRes.headers['content-encoding'], function (body) {
 
-        // Modify CSS on the fly:
-        // [TIP] -> It's possible to modify JS too if required (same logic as CSS) for sites with hydration
-        if (proxyRes.req.path.slice(proxyRes.req.path.length - 4) === '.css') {
-            return body.replaceAll('url("/', 'url("https://www.apple.com/')
-        }
+
+
+        const proxyReqPath = proxyRes.req.path;
 
         // LAST CHOICE TO CHANGE THINGS WITH BRUTE FORCE (TRY HARMON FIRST):
         if (body) {
-            // Example of changing by brute force the srcset of pictures using regex:
+
             let bodyString = body;
 
-            // Inserting the script 
+            // bodyString = bodyString.replaceAll('utag.js', 'controlledError.js');
+            if (proxyRes.headers["content-type"] && proxyRes.headers["content-type"].includes('html')) {
+                bodyString = bodyString.replaceAll(
+                    'www.adolfodominguez.com/on/demandware.store/Sites-ad-es-Site/es_ES/Search-UpdateGrid',
+                    `${SUBDOMAIN_HOST}${PORT_STRING}/on/demandware.store/Sites-ad-es-Site/es_ES/Search-UpdateGrid`
+                );
+                bodyString = bodyString.replaceAll(
+                    'www.adolfodominguez.com/on/demandware.store/Sites-ad-es-Site/es_ES/Product-Variation',
+                    `${SUBDOMAIN_HOST}${PORT_STRING}/on/demandware.store/Sites-ad-es-Site/es_ES/Product-Variation`
+                )
+            }
+
+
+            // Cambiando contenido de un JSON en el vuelo:
+            if (proxyRes.headers["content-type"] && proxyRes.headers["content-type"].includes('json')) {
+                bodyString = bodyString.replaceAll('url": "/on/demandware.static/', `url": "https://${BRAND_URL}/on/demandware.static/`);
+            }
+
+
+            const regexForHomeUrls = /href="https:.*?adolfodominguez.com/gm
+            const regexForHomeMatchesNew = [...bodyString.matchAll(regexForHomeUrls)];
+            regexForHomeMatchesNew.map(old => bodyString = bodyString.replaceAll(old[0], old[0].replaceAll('www.adolfodominguez.com', `${SUBDOMAIN_HOST}${PORT_STRING}`)));
+
+            // Inserting the script
             // TODO: Check that it's an html content to insert the script
             bodyString = bodyString.replaceAll('</body>', `<script type="text/javascript" defer>${fs.readFileSync(`${PROXY_FOLDER}/script.js`)}</script><style>${fs.readFileSync(`${PROXY_FOLDER}/overrides.css`)}</style></body>`)
-            
-            const srcsetRegex = /srcset="\/.*?"/gm;
-            const srcsetMatches = [...bodyString.matchAll(srcsetRegex)];
-            srcsetMatches.map(old => bodyString = bodyString.replaceAll(old[0], old[0].replaceAll('srcset="/', 'srcset="https://www.apple.com/')
-                .replaceAll(' /', ' https://www.apple.com/')
-            ))
             return bodyString;
         }
         return body;
@@ -121,67 +137,53 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
 // Harmon:
 router.use(harmon([], [
     {
-        query: '[src^="/"]',
+        query: 'div[class*="personalizedExperienceesp"]',
         func: (node) => {
-            let currentSrc = node.getAttribute('src');
-            node.setAttribute('src', `https://${BRAND_URL}${currentSrc}`)
+            if (node) {
+                node.setAttribute('style', 'display:none');
+            }
         }
     },
     {
-        query: 'link[href^="/wss"]',
+        query: 'a[href*="adolfodominguez.com"]',
         func: (node) => {
             let currentHref = node.getAttribute('href');
-            node.setAttribute('href', `https://${SUBDOMAIN_HOST}${PORT_STRING}${currentHref}`)
+            node.setAttribute('href', currentHref.replaceAll("www.adolfodominguez.com", `${SUBDOMAIN_HOST}${PORT_STRING}`));
         }
     },
     {
-        query: 'link[href^="https://www.apple.com/wss"]',
+        query: 'link[href$=".ttf"]',
         func: (node) => {
             let currentHref = node.getAttribute('href');
-            node.setAttribute('href', currentHref.replaceAll(BRAND_URL, `${SUBDOMAIN_HOST}${PORT_STRING}`))
-        }
-    },
-    {
-        query: 'link[href$=".css"]',
-        func: (node) => {
-            let currentHref = node.getAttribute('href');
-            if (currentHref[0] === '/') {
+            if (currentHref) {
                 node.setAttribute('href', `https://${SUBDOMAIN_HOST}${PORT_STRING}${currentHref}`)
             }
+
         }
-    },
-    {
-        query: 'a[href*="www.apple.com"]',
+    }, {
+        query: 'a[href^="https://www.adolfodominguez.com"]',
         func: (node) => {
             let currentHref = node.getAttribute('href');
-            node.setAttribute('href', currentHref.replaceAll(BRAND_URL, `${SUBDOMAIN_HOST}${PORT_STRING}`));
-        }
-    },
-    {
-        query: 'link[href^="/"]',
-        func: (node) => {
-            let currentHref = node.getAttribute('href');
-            node.setAttribute('href', `https://${BRAND_URL}${currentHref}`)
-        }
-    },
-    {
-        query: '[href*="/goto/"]',
-        func: (node) => {
-            let currentHref = node.getAttribute('href');
-            if (currentHref.includes('buy_mac/macbook_air_m2')) {
-                currentHref = currentHref.replaceAll('macbook_air_m2', 'macbook-air/con-chip-m2');
+            if (currentHref) {
+                node.setAttribute('href', currentHref.replaceAll("www.adolfodominguez.com", `${SUBDOMAIN_HOST}${PORT_STRING}`))
             }
-            if (currentHref.includes('shop/goto/store')) {
-                currentHref = currentHref.replaceAll('/shop/goto/','/');
-            }
-            node.setAttribute('href', currentHref.replaceAll('/goto/', '/').replaceAll('_', '-'));
         }
-    },
-    {
+    }, {
+        query: 'img[data-src^="/"]',
+        func: (node) => {
+            let currentSrc = node.getAttribute('data-src');
+            if (currentSrc) {
+                node.setAttribute('data-src', `//www.adolfodominguez.com${currentSrc}`)
+            }
+        }
+    }
+    , {
         query: 'img[src^="/"]',
         func: (node) => {
             let currentSrc = node.getAttribute('src');
-            node.setAttribute('src', `https://${BRAND_URL}${currentSrc}`);
+            if (currentSrc) {
+                node.setAttribute('src', `//www.adolfodominguez.com${currentSrc}`)
+            }
         }
     }
 ]));
@@ -196,11 +198,11 @@ proxy.on('proxyReq', function (proxyReq, req, res, options) {
 });
 
 // Router for font css:
-router.all('/wss/fonts', (req, res) => {
+router.all('/assets/fonts/', (req, res) => {
     // Config extracted from postman request:
     var config = {
         method: 'get',
-        url: `https://www.apple.com${req.originalUrl}`,
+        url: `https://www.adolfodominguez.com${req.originalUrl}`,
         headers: {
             'authority': BRAND_URL,
             'accept': 'text/css,*/*;q=0.1',
@@ -220,28 +222,50 @@ router.all('/wss/fonts', (req, res) => {
         });
 });
 
-// Router for fonts:
-router.all('/wss/fonts*', async (req, res) => {
+
+router.all('/*.ttf', async (req, res) => { // Change to custom font urls
     const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
     res.sendFile(data.fileName, { root: data.root });
 });
 
-// Routers for images:
-router.all('/*.png', async (req, res) => { // Change to custom font urls
-    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
-    res.sendFile(data.fileName, { root: data.root });
-});
-router.all('/*.jpg', async (req, res) => { // Change to custom font urls
-    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
-    res.sendFile(data.fileName, { root: data.root });
-});
-router.all('/*.webp', async (req, res) => { // Change to custom font urls
+router.all('/*.woff', async (req, res) => { // Change to custom font urls
     const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
     res.sendFile(data.fileName, { root: data.root });
 });
 
-router.all('/', (req, res) => {
-    res.redirect('/es');
+router.all('/*.woff2', async (req, res) => { // Change to custom font urls
+    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
+    res.sendFile(data.fileName, { root: data.root });
+});
+
+router.all('/*.css', async (req, res) => {
+    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
+    res.sendFile(data.fileName, { root: data.root });
+});
+
+router.all('/*.ico', async (req, res) => {
+    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
+    res.sendFile(data.fileName, { root: data.root });
+});
+
+router.all('/*.png', async (req, res) => {
+    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
+    res.sendFile(data.fileName, { root: data.root });
+});
+
+router.all('/*.jpg', async (req, res, next) => {
+    if (req.path.startsWith('/on/demandware.static/')) return next()
+    const data = await cacheFile(req.path, STATIC_FOLDER, BRAND_URL);
+    res.sendFile(data.fileName, { root: data.root });
+});
+
+router.all("/", (req, res) => {
+    res.redirect("/es-es/")
+})
+
+// Redirect cart path to home to prevent from buying
+router.all("*/cart", (req, res) => {
+    res.redirect("/es-es/")
 })
 
 // Router general:

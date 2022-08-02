@@ -15,8 +15,12 @@ app.use(subdomain('example', exampleRouter));
 
 	// Reals:
 const appleRouter = require('./proxies/apple/router');
+app.use(subdomain('apple.dev', appleRouter));
+const appleRouter = require('./proxies/apple/router');
 app.use(subdomain('apple', appleRouter));
 
+const adolfodominguezRouter = require('./proxies/adolfodominguez/router');
+app.use(subdomain('adolfodominguez', adolfodominguezRouter));
 
 // Main Router:
 

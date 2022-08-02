@@ -1,0 +1,24 @@
+:root {
+    --middle-end-height: 128px;
+}
+
+/* Make body relative */
+body {
+    position: relative;
+    top: var(--middle-end-height);
+}
+
+.rf-promo-ribbon, /* 24 meses financiacion */
+.rf-flagship-tradeup, /* Entregar iPhone/iPad */
+.rf-flagship-accessories, /* Accesorios */
+.rf-flagship-engraving, /* Grabado */
+.rf-flagship-accdecision, /* Accesorios añadidos */
+.rf-configuration-categorypresoftware, /* Software */
+.rf-purchaseoptions-section /* Pago a plazos */
+    {
+        display: none;
+}
+
+.rf-flagship-buyflow-columnright div.rf-inlineaccessorylot {
+    display: none;
+}
