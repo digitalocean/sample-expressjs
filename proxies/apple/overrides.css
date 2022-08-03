@@ -8,7 +8,7 @@ body {
     top: var(--middle-end-height) !important;
 }
 
-nav #ac-globalnav {
+nav#ac-globalnav {
     position: absolute !important;
 }
 
