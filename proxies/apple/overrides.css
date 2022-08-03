@@ -5,7 +5,7 @@
 /* Make body relative */
 body {
     position: relative;
-    top: var(--middle-end-height);
+    top: var(--middle-end-height) !important;
 }
 
 .rf-promo-ribbon, /* 24 meses financiacion */

@@ -1,7 +1,7 @@
 // TODO: Clean this and make utils.
 
 document.addEventListener('DOMContentLoaded', () => {
-    addIframe()
+    if (!iframe) { addIframe(); }
 })
 
 addIframe()
