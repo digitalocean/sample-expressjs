@@ -8,6 +8,10 @@ body {
     top: var(--middle-end-height) !important;
 }
 
+nav #ac-globalnav {
+    position: absolute !important;
+}
+
 .rf-promo-ribbon, /* 24 meses financiacion */
 .rf-flagship-tradeup, /* Entregar iPhone/iPad */
 .rf-flagship-accessories, /* Accesorios */
