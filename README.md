@@ -1,6 +1,3 @@
-> ⚠️ **This repository is archived and no longer maintained.**  
-> Please use the actively maintained version here: [digitalocean/sample-nodejs](https://github.com/digitalocean/sample-nodejs)
-
 ## Getting Started
 
 We provide a sample app using Express that you can deploy on App Platform. These steps will get this sample application running for you using App Platform.
