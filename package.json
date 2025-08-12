@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-	"start": "node index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +15,8 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "bun-types": "^1.2.20"
   }
 }
