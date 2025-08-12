@@ -8,7 +8,7 @@ RUN npm ci || npm install
 
 # Copy source and build
 COPY . .
-# If your project name is set in angular.json, ng build will output to /app/dist
+# Angular 20 outputs to /app/dist/earth-forum-app
 RUN npm run build
 
 # Serve with Nginx
@@ -19,7 +19,7 @@ WORKDIR /
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built assets (covers both dist/<project> and dist/<project>/browser)
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist/earth-forum-app/browser /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

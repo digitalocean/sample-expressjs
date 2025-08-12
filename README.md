@@ -1,6 +1,48 @@
+# Earth Forum
+
+A modern web application with a Bun backend and Angular 20 frontend, deployable on DigitalOcean App Platform.
+
+## Architecture
+
+- **Backend**: Bun runtime with TypeScript
+- **Frontend**: Angular 20 with SSR support
+- **Deployment**: DigitalOcean App Platform with Docker containers
+
 ## Getting Started
 
-We provide a sample app using Express that you can deploy on App Platform. These steps will get this sample application running for you using App Platform.
+### Prerequisites
+
+- Node.js 20+ (for Angular CLI)
+- Bun runtime (for backend)
+- DigitalOcean account
+
+### Local Development
+
+1. **Frontend (Angular 20)**:
+   ```bash
+   cd frontend
+   npm install
+   npm start
+   ```
+   The Angular app will be available at http://localhost:4200
+
+2. **Backend (Bun)**:
+   ```bash
+   cd backend  
+   bun install
+   bun dev
+   ```
+   The API will be available at http://localhost:3000
+
+### Docker Development
+
+Use Docker Compose to run both services:
+
+```bash
+docker-compose up
+```
+
+## Deploying to DigitalOcean App Platform
 
 **Note: Following these steps may result in charges for the use of DigitalOcean services.**
 
@@ -12,7 +54,7 @@ We provide a sample app using Express that you can deploy on App Platform. These
 
 Click this button to deploy the app to the DigitalOcean App Platform. If you are not logged in, you will be prompted to log in with your DigitalOcean account.
 
-[![Deploy to DigitalOcean](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/digitalocean/sample-expressjs/tree/main)
+[![Deploy to DigitalOcean](https://www.deploytodo.com/do-btn-blue.svg)](https://cloud.digitalocean.com/apps/new?repo=https://github.com/Hadroon/earth-forum/tree/main)
 
 Using this button disables the ability to automatically re-deploy your app when pushing to a branch or tag in your repository as you are using this repo directly.
 
